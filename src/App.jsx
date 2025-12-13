@@ -20,6 +20,66 @@ function App() {
       setLoading(false);
       return;
     }
+      // --- Core Fetching Logic ---
+  const fetchMoviesAndDetails = async (query, page, append = false) => {
+    setLoading(true);
+    setError(null);
+    setCurrentQuery(query);
+    
+    // OMDB pages start at 1 and go up sequentially. 
+    // Since we fetch 2 pages at a time, we jump by 2: 1 -> 3 -> 5
+    const startPage = page === 1 ? 1 : ((page - 1) * 2) + 1;
+
+    try {
+      const { movies: initialMovies, totalResults: total } = await fetchPaginatedMovies(query, startPage);
+      
+      setTotalResults(total);
+
+      if (initialMovies.length === 0) {
+        setLoading(false);
+        if (!append) { 
+            setAllMovies([]);
+            setDisplayedMovies([]);
+        }
+        return;
+      }
+
+      // 1. Fetch details for every movie to get the Genre field
+      const detailPromises = initialMovies.map(movie => 
+          getMovieDetails(movie.imdbID).catch(e => {
+            console.error(`Failed to get details for ${movie.Title}:`, e);
+            return null; 
+          })
+      );
+
+      const detailedMovies = (await Promise.all(detailPromises)).filter(m => m && m.Response === 'True');
+      
+      // 2. Update the main movie list
+      if (append) {
+        setAllMovies(prev => {
+            const combined = [...prev, ...detailedMovies];
+            // Re-sort the entire combined list after appending new movies
+            return sortByYearDescending(combined);
+        });
+      } else {
+        // Sort the fresh list and store it
+        setAllMovies(sortByYearDescending(detailedMovies)); 
+      }
+      
+      setCurrentPage(page + 1); // Set the next page number for the next load
+      
+    } catch (err) {
+      setError(err.message || 'An unknown error occurred.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+      // --- 1. Initial Load Effect: Runs once on mount ---
+  useEffect(() => {
+    fetchMoviesAndDetails(DEFAULT_SEARCH_TERM, 1, false);
+  }, []);
 
     try {
       const results = await searchMovies(query);

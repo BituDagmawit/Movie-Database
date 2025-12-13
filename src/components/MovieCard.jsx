@@ -1,19 +1,26 @@
-// src/components/MovieCard.jsx
+
 import React from 'react';
 
-function MovieCard({ movie }) {
+function MovieCard({ movie, onClick }) {
+  // Use a placeholder if the poster is "N/A"
+  const posterUrl = movie.Poster && movie.Poster !== 'N/A' 
+    ? movie.Poster 
+    : 'https://via.placeholder.com/300x450?text=No+Poster';
+
   return (
-    // Note: onClick handler is removed
-    <div className="bg-gray-800 rounded-lg shadow-xl overflow-hidden cursor-pointer hover:shadow-red-500/50 transition duration-300">
-      <img
-        src={movie.Poster !== 'N/A' ? movie.Poster : 'https://via.placeholder.com/300x450?text=No+Poster'}
-        alt={movie.Title}
-        className="w-full h-auto object-cover"
-        style={{ height: '300px' }} // Keep a consistent size
+    <div 
+      className="bg-gray-800 rounded-lg overflow-hidden shadow-xl hover:shadow-2xl transition duration-300 cursor-pointer transform hover:scale-[1.02]"
+      onClick={() => onClick(movie.imdbID)}
+    >
+      <img 
+        src={posterUrl} 
+        alt={`${movie.Title} Poster`} 
+        className="w-full h-80 object-cover" 
+        loading="lazy"
       />
-      <div className="p-4 text-white">
-        <h3 className="text-lg font-semibold truncate">{movie.Title}</h3>
-        <p className="text-gray-400 text-sm">{movie.Year}</p>
+      <div className="p-4">
+        <h3 className="text-lg font-bold text-white truncate">{movie.Title}</h3>
+        <p className="text-sm text-gray-400">({movie.Year})</p>
       </div>
     </div>
   );
