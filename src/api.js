@@ -1,11 +1,12 @@
 // src/api.js
 
+// !!! IMPORTANT: REPLACE 'YOUR_OMDB_API_KEY' with your actual key !!!
 const API_KEY = '1736dba4';
 
 const API_BASE_URL = `https://www.omdbapi.com/?apikey=${API_KEY}`;
 const MOVIES_PER_LOAD = 18;
 
-/*
+/**
  * Searches for movies by title, fetching a specific page (max 10 results per call).
  * This function returns both the movie array and the total results count.
  */

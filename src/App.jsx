@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { fetchPaginatedMovies, getMovieDetails } from './api';
 import SearchBar from './components/SearchBar';
 import MovieCard from './components/MovieCard';
+import MovieDetails from './components/MovieDetails';
+import GenreFilter from './components/GenreFilter';
 
 const MOVIES_PER_LOAD = 18;
 // Setting a popular franchise increases the chance of finding recent movies
@@ -193,14 +195,23 @@ function App() {
           🎬 Bitu Movie Database
         </h1>
         <SearchBar onSearch={handleSearch} />
+        <GenreFilter 
+          selectedGenre={selectedGenre} 
+          onGenreChange={handleGenreChange} 
+        />
       </header>
 
       <main className="container mx-auto py-8">
         {renderContent()}
       </main>
 
-      {/* Movie Details Modal/View... */}
-
+      {/* Movie Details Modal/View */}
+      {selectedMovieId && (
+        <MovieDetails 
+          imdbID={selectedMovieId} 
+          onClose={handleCloseDetails} 
+        />
+      )}
     </div>
   );
 }
